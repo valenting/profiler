@@ -571,7 +571,11 @@ export type NetworkPayload = {
   // connections. This is also the case for `domainLookupEnd`, `connectStart`,
   // `tcpConnectEnd`, `secureConnectionStart`, and `connectEnd`.
   // NOTE: If you add a new property, don't forget to adjust its timestamp in
-  // `adjustMarkerTimestamps` in `process-profile.js`.
+  // `adjustMarkerTimestamps` in `process-profile.ts`.
+  // cacheReadStart is when the cache read starts
+  cacheReadStart?: Milliseconds;
+  // cacheReadEnd is when the cache read ends
+  cacheReadEnd?: Milliseconds;
   domainLookupStart?: Milliseconds;
   domainLookupEnd?: Milliseconds;
   connectStart?: Milliseconds;

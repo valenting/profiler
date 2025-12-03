@@ -14,6 +14,8 @@ export type NetworkRedirectType = 'Permanent' | 'Temporary' | 'Internal';
 
 export type NetworkPhaseName =
   | 'startTime'
+  | 'cacheReadStart'
+  | 'cacheReadEnd'
   | 'domainLookupStart'
   | 'domainLookupEnd'
   | 'connectStart'

@@ -1395,6 +1395,12 @@ export function adjustMarkerTimestamps(
         newData.cause.time += delta;
       }
       if (newData.type === 'Network') {
+        if (typeof newData.cacheReadStart === 'number') {
+          newData.cacheReadStart += delta;
+        }
+        if (typeof newData.cacheReadEnd === 'number') {
+          newData.cacheReadEnd += delta;
+        }
         if (typeof newData.domainLookupStart === 'number') {
           newData.domainLookupStart += delta;
         }

@@ -38,6 +38,8 @@ import './NetworkMarker.css';
 /* The labels are for the duration between _this_ label and the next label. */
 const HUMAN_LABEL_FOR_PHASE: Record<NetworkPhaseName, string> = {
   startTime: 'Waiting for socket thread',
+  cacheReadStart: 'Reading from cache',
+  cacheReadEnd: 'After cache read',
   domainLookupStart: 'DNS request',
   domainLookupEnd: 'After DNS request',
   connectStart: 'TCP connection',
@@ -46,12 +48,14 @@ const HUMAN_LABEL_FOR_PHASE: Record<NetworkPhaseName, string> = {
   connectEnd: 'Waiting for HTTP request',
   requestStart: 'HTTP request and waiting for response',
   responseStart: 'HTTP response',
-  responseEnd: 'Waiting for main thread',
+  responseEnd: 'After HTTP response',
   endTime: 'End',
 };
 
 const OPACITY_FOR_PHASE: Record<NetworkPhaseName, number> = {
   startTime: 0,
+  cacheReadStart: 0.75,
+  cacheReadEnd: 0,
   domainLookupStart: 0.5,
   domainLookupEnd: 0.5,
   connectStart: 0.5,

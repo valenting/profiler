@@ -26,6 +26,8 @@ export const PRECONNECT_PHASES_IN_ORDER: NetworkPhaseName[] = [
 export const ALL_NETWORK_PHASES_IN_ORDER: NetworkPhaseName[] = [
   'startTime',
   ...PRECONNECT_PHASES_IN_ORDER,
+  'cacheReadStart',
+  'cacheReadEnd',
   'requestStart',
   'responseStart',
   'responseEnd',
