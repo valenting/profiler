@@ -167,6 +167,25 @@ describe('console-accessible values on the window object', function () {
     `);
   });
 
+  it('extracts a log message that is interned at string index 0', function () {
+    // `message` is a string-table index, so a message that happens to be the
+    // very first interned string has index 0. That's a valid entry and must not
+    // be skipped as if it were missing.
+    const profile = getProfileWithMarkers([
+      // This marker's name is the first string interned in the table, so
+      // reusing the same text for the message gives it index 0.
+      ['nsHttp', 170, null, { type: 'Log', level: 'Debug', message: 'nsHttp' }],
+    ]);
+    expect(profile.shared.stringArray[0]).toBe('nsHttp');
+    const store = storeWithProfile(profile);
+    const target: MixedObject = {};
+    addDataToWindowObject(store.getState, store.dispatch, target);
+    const result = (target as any).extractGeckoLogs();
+    expect(result).toBe(stripIndent`
+      1970-01-01 00:00:00.170000000 UTC - [Unknown Process 0: Empty]: D/nsHttp nsHttp
+    `);
+  });
+
   describe('totalMarkerDuration', function () {
     function setup(): ExtraPropertiesOnWindowForConsole {
       jest.spyOn(console, 'log').mockImplementation(() => {});

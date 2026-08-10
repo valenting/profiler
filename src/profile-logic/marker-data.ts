@@ -1732,15 +1732,38 @@ export function formatLogTimestamp(absoluteMs: number): string {
 }
 
 /**
+ * Resolve the message of a new-format Log marker payload, and trim it.
+ *
+ * The Log marker schema declares `message` with the `unique-string` format, so
+ * the payload holds an index into the string table rather than the text itself.
+ * A raw string is tolerated too, so that this keeps working if a profile ever
+ * stores the message inline.
+ *
+ * Returns null when the message is missing or empty, meaning the entry should
+ * be skipped. Note that 0 is a perfectly valid string index.
+ */
+export function getLogMarkerMessage(
+  message: IndexIntoStringTable | string,
+  stringArray: string[]
+): string | null {
+  const text = typeof message === 'string' ? message : stringArray[message];
+  if (!text) {
+    return null;
+  }
+  const trimmed = text.trim();
+  return trimmed === '' ? null : trimmed;
+}
+
+/**
  * Format a Log marker payload into a MOZ_LOG canonical line.
  *
  * Returns null if the entry has no message content and should be skipped.
  *
  * Two payload formats are supported:
- *  - New format: { message, level } where `level` is a string table index
- *    resolving to "Error" / "Warning" / "Info" / "Debug" / "Verbose", and the
- *    module name is taken from the marker's `name` field (also a string table
- *    index, passed here as `moduleName`).
+ *  - New format: { message, level } where both are string table indexes,
+ *    `level` resolving to "Error" / "Warning" / "Info" / "Debug" / "Verbose",
+ *    and the module name is taken from the marker's `name` field (also a string
+ *    table index, passed here as `moduleName`).
  *  - Legacy format: { name, module } where `module` may include a level prefix
  *    ("D/nsHttp") or just a bare module name ("nsHttp").
  */
@@ -1754,12 +1777,13 @@ export function formatLogStatement(
   stringArray: string[]
 ): string | null {
   if ('message' in data) {
-    if (!data.message) {
+    const message = getLogMarkerMessage(data.message, stringArray);
+    if (message === null) {
       return null;
     }
     const levelStr = stringArray[data.level] ?? '';
     const levelLetter = LOG_LEVEL_STRING_TO_LETTER[levelStr] ?? 'D';
-    return `${timestampStr} - [${processName} ${pid}: ${threadName}]: ${levelLetter}/${moduleName} ${data.message.trim()}`;
+    return `${timestampStr} - [${processName} ${pid}: ${threadName}]: ${levelLetter}/${moduleName} ${message}`;
   }
   if (!data.name) {
     return null;

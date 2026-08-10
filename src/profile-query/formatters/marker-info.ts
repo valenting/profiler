@@ -61,6 +61,7 @@ import {
   LOG_LETTER_TO_LEVEL,
   formatLogTimestamp,
   formatLogStatement,
+  getLogMarkerMessage,
 } from 'firefox-profiler/profile-logic/marker-data';
 import { formatFunctionNameWithLibrary } from '../function-list';
 import type {
@@ -1423,13 +1424,17 @@ export function collectProfileLogs(
       let levelLetter: string;
 
       if ('message' in logData) {
-        if (!logData.message) {
+        const resolvedMessage = getLogMarkerMessage(
+          logData.message,
+          stringArray
+        );
+        if (resolvedMessage === null) {
           continue;
         }
         moduleName = stringArray[markers.name[i]] ?? '';
         const levelStr = stringArray[logData.level] ?? '';
         levelLetter = LOG_LEVEL_STRING_TO_LETTER[levelStr] ?? 'D';
-        message = logData.message.trim();
+        message = resolvedMessage;
       } else {
         if (!logData.name) {
           continue;
